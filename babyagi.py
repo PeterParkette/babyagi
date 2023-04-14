@@ -66,18 +66,16 @@ DOTENV_EXTENSIONS = os.getenv("DOTENV_EXTENSIONS", "").split(" ")
 ENABLE_COMMAND_LINE_ARGS = (
     os.getenv("ENABLE_COMMAND_LINE_ARGS", "false").lower() == "true"
 )
-if ENABLE_COMMAND_LINE_ARGS:
-    if can_import("extensions.argparseext"):
-        from extensions.argparseext import parse_arguments
+if ENABLE_COMMAND_LINE_ARGS and can_import("extensions.argparseext"):
+    from extensions.argparseext import parse_arguments
 
-        OBJECTIVE, INITIAL_TASK, OPENAI_API_MODEL, DOTENV_EXTENSIONS = parse_arguments()
+    OBJECTIVE, INITIAL_TASK, OPENAI_API_MODEL, DOTENV_EXTENSIONS = parse_arguments()
 
 # Load additional environment variables for enabled extensions
-if DOTENV_EXTENSIONS:
-    if can_import("extensions.dotenvext"):
-        from extensions.dotenvext import load_dotenv_extensions
+if DOTENV_EXTENSIONS and can_import("extensions.dotenvext"):
+    from extensions.dotenvext import load_dotenv_extensions
 
-        load_dotenv_extensions(DOTENV_EXTENSIONS)
+    load_dotenv_extensions(DOTENV_EXTENSIONS)
 
 # TODO: There's still work to be done here to enable people to get
 # defaults from dotenv extensions # but also provide command line
@@ -197,7 +195,7 @@ def task_creation_agent(
 def prioritization_agent(this_task_id: int):
     global task_list
     task_names = [t["task_name"] for t in task_list]
-    next_task_id = int(this_task_id) + 1
+    next_task_id = this_task_id + 1
     prompt = f"""
     You are a task prioritization AI tasked with cleaning the formatting of and reprioritizing the following tasks: {task_names}.
     Consider the ultimate objective of your team:{OBJECTIVE}.
